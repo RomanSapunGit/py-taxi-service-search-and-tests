@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.models import QuerySet
 from django.test import TestCase
 from django.urls import reverse
 
@@ -41,7 +42,7 @@ class PrivateViewTests(TestCase):
         car1 = Car.objects.get(pk=1)
         car2 = Car.objects.get(pk=2)
 
-        self.assertEquals(list(response.context["car_list"]), [car1, car2])
+        self.assertEqual(list(response.context["car_list"]), [car1, car2])
 
     def test_car_list_search(self):
         response = self.client.get("/cars/?model=1")
@@ -49,7 +50,7 @@ class PrivateViewTests(TestCase):
 
         car1 = Car.objects.get(pk=1)
 
-        self.assertEqual(*response.context["car_list"], car1)
+        self.assertEqual(list(response.context["car_list"]), [car1])
 
     def test_car_delete_view_success_url(self):
         self.client.delete(
@@ -72,19 +73,22 @@ class PrivateViewTests(TestCase):
             kwargs={"pk": 2})
         )
         car = Car.objects.get(pk=2)
-        Car.refresh_from_db(car)
-        self.assertTrue(car.drivers.all())
+        car.refresh_from_db()
+        self.assertEqual(
+            car.drivers.get(pk=1),
+            get_user_model().objects.get(pk=1)
+        )
 
     def test_index_num_visits(self):
-        response = self.client.get(reverse(
+        self.client.get(reverse(
             "taxi:index"
         ))
 
-        self.assertTrue(response.context["num_visits"], 1)
+        self.assertEqual(self.client.session["num_visits"], 1)
 
         for _ in range(10):
             self.client.get(reverse(
                 "taxi:index"
             ))
 
-        self.assertTrue(response.context["num_visits"], 11)
+        self.assertEqual(self.client.session["num_visits"], 11)
