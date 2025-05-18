@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.db.models import QuerySet
 from django.test import TestCase
 from django.urls import reverse
 
@@ -9,7 +8,7 @@ from taxi.models import Manufacturer, Car
 class PublicManufacturerTests(TestCase):
     def test_anonymous_access_false(self):
         response = self.client.get("/manufacturers/")
-        self.assertNotEquals(response.status_code, 200)
+        self.assertNotEqual(response.status_code, 200)
 
 
 class PrivateViewTests(TestCase):

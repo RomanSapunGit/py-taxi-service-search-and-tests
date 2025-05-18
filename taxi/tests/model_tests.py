@@ -16,11 +16,11 @@ class ModelTest(TestCase):
             model="test1",
             manufacturer=manufacturer
         )
-        self.assertTrue(car, "test1")
+        self.assertEqual(car, "test1")
 
     def test_driver_returns_correct_path(self):
         driver = get_user_model().objects.create_user(
             username="user",
             password="pass"
         )
-        self.assertTrue(driver.get_absolute_url(), DRIVER_ABSOLUTE_URL)
+        self.assertEqual(driver.get_absolute_url(), DRIVER_ABSOLUTE_URL)
